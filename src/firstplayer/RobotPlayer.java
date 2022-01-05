@@ -20,12 +20,7 @@ public strictfp class RobotPlayer {
     };
 
     public static void run(RobotController rc) throws GameActionException {
-        System.out.println("I'm a " + rc.getType() + " and I just got created! I have health " + rc.getHealth());
-        rc.setIndicatorString("Hello world!");
-
         while (true) {
-            turnCount += 1;  // We have now been alive for one more turn!
-            System.out.println("Age: " + turnCount + "; Location: " + rc.getLocation());
             try {
                 switch (rc.getType()) {
                     case ARCHON:        Archon.run(rc);     break;
@@ -43,10 +38,11 @@ public strictfp class RobotPlayer {
             } catch (Exception e) {
                 System.out.println(rc.getType() + " Exception");
                 e.printStackTrace();
-
             } finally {
                 Clock.yield();
             }
+
+            turnCount++;
         }
     }
 }
