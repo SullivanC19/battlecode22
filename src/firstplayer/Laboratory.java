@@ -7,6 +7,5 @@ public class Laboratory {
         while (rc.canTransmute()) {
             rc.transmute();
         }
-        Clock.yield();
     }
 }
