@@ -1,9 +1,4 @@
 package firstplayer;
-import battlecode.common.*;
-
-import java.util.Random;
-
-public class Miner {
     static final Random rng = new Random(6147);
     static final int VISION_RADIUS = 20;
     static final Direction[] directions = {
