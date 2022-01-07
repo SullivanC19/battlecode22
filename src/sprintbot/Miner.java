@@ -37,24 +37,24 @@ public class Miner {
             return;
         }
 
-        // move toward closest food block if one exists
-        List<MapLocation> foodBlocks = Communication.getAllLeadBlocks();
-        if (!foodBlocks.isEmpty()) {
+        // move toward closest lead block if one exists
+        List<MapLocation> leadBlocks = Communication.getAllLeadBlocks();
+        if (!leadBlocks.isEmpty()) {
             MapLocation loc = Memory.rc.getLocation();
             MapLocation block = new MapLocation(loc.x / Utils.LEAD_BLOCK_SIZE, loc.y / Utils.LEAD_BLOCK_SIZE);
             int closestDist = Integer.MAX_VALUE;
-            for (MapLocation foodBlock : foodBlocks) {
-                closestDist = Math.min(closestDist, block.distanceSquaredTo(foodBlock));
+            for (MapLocation leadBlock : leadBlocks) {
+                closestDist = Math.min(closestDist, block.distanceSquaredTo(leadBlock));
             }
 
             int cnt = 0;
             MapLocation targetBlock = null;
-            for (MapLocation foodBlock : foodBlocks) {
-                int dist = block.distanceSquaredTo(foodBlock);
+            for (MapLocation leadBlock : leadBlocks) {
+                int dist = block.distanceSquaredTo(leadBlock);
                 if (dist + 5 >= closestDist) {
                     cnt++;
                     if (Utils.rng.nextInt(cnt) == 0) {
-                        targetBlock = foodBlock;
+                        targetBlock = leadBlock;
                     }
                 }
             }

@@ -91,7 +91,7 @@ public class Communication {
 
     }
 
-    public static int getTotalFoodArea() throws GameActionException {
+    public static int getTotalLeadArea() throws GameActionException {
         int tot = 0;
         for (int i = 0; i < LEAD_BLOCK_ARRAY_SIZE; i++) {
             tot += Integer.bitCount(Memory.rc.readSharedArray(i));
