@@ -10,6 +10,7 @@ public class Communication {
     public static final int SHARED_ARRAY_INTEGER_SIZE = 16;
 
     public static final int LEAD_BLOCK_ARRAY_SIZE = Utils.NUM_BLOCKS * Utils.NUM_BLOCKS / SHARED_ARRAY_INTEGER_SIZE;
+    public static final int DROID_COUNTS_ARRAY_SIZE = Utils.droidTypes.length * Utils.MAX_NUM_ARCHONS;
 
     public static void updateLead() throws GameActionException {
         MapLocation loc = Memory.rc.getLocation();
@@ -29,19 +30,31 @@ public class Communication {
         setLeadBlock(blockX, blockY, sensesLeadInBlock);
     }
 
-    public static int getDroidCount(RobotType robotType) {
-        switch (robotType) {
-            case BUILDER:
-                return 0;
-            case SOLDIER:
-                return 0;
-            case MINER:
-                return 0;
-            case SAGE:
-                return 0;
-            default:
-                return 0;
+    public static void updateDroidCount() throws GameActionException {
+        // archon's reset the droid count
+        if (Memory.rc.getType() == RobotType.ARCHON) {
+            int firstIdx = LEAD_BLOCK_ARRAY_SIZE + getDroidCountIdx(Memory.archonId, 0);
+            for (int i = 0; i < Utils.droidTypes.length; i++) {
+                Memory.rc.writeSharedArray(firstIdx + i, 0);
+            }
+            return;
         }
+
+        int droidTypeIdx = Utils.getDroidTypeIdx(Memory.rc.getType());
+        if (droidTypeIdx == -1) return;
+
+        int i = LEAD_BLOCK_ARRAY_SIZE + getDroidCountIdx(Memory.archonId, droidTypeIdx);
+        int curCount = Memory.rc.readSharedArray(i);
+        Memory.rc.writeSharedArray(i, curCount + 1);
+    }
+
+    private static int getDroidCountIdx(int archonId, int droidTypeIdx) {
+        return archonId * Utils.droidTypes.length + droidTypeIdx;
+    }
+
+    public static int getDroidCount(RobotType robotType) throws GameActionException {
+        int droidTypeIdx = Utils.getDroidTypeIdx(robotType);
+        return Memory.rc.readSharedArray(LEAD_BLOCK_ARRAY_SIZE + getDroidCountIdx(Memory.archonId, droidTypeIdx));
     }
 
     private static int getBlockIdx(int blockX, int blockY) {

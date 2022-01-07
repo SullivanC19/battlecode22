@@ -36,5 +36,8 @@ public class Archon {
 
             }
         }
+
+        // archon will reset the droid count for the turn so we put it last
+        Communication.updateDroidCount();
     }
 }

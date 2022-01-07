@@ -5,6 +5,7 @@ import battlecode.common.*;
 public class Soldier {
     public static void run() throws GameActionException {
         Communication.updateLead();
+        Communication.updateDroidCount();
 
         // Try to attack someone
         int radius = Memory.rc.getType().actionRadiusSquared;

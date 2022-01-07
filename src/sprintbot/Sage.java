@@ -4,6 +4,9 @@ import battlecode.common.*;
 
 public class Sage {
     public static void run() throws GameActionException {
+        Communication.updateLead();
+        Communication.updateDroidCount();
+
         RobotInfo closestEnemyRobot = Utils.getClosestEnemyRobot();
 
         Direction dir = Utils.randomDirection();
