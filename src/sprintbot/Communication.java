@@ -29,7 +29,7 @@ public class Communication {
         setLeadBlock(blockX, blockY, sensesLeadInBlock);
     }
 
-    private static int getDroidCount(RobotType robotType) {
+    public static int getDroidCount(RobotType robotType) {
         switch (robotType) {
             case BUILDER:
                 return 0;
