@@ -3,30 +3,36 @@ package sprintbot;
 import battlecode.common.*;
 
 public class Sage {
-    public static void run(RobotController rc) throws GameActionException {
-        RobotInfo closestEnemyRobot = Utils.getClosestEnemyRobot(rc);
+    public static void run() throws GameActionException {
+        RobotInfo closestEnemyRobot = Utils.getClosestEnemyRobot();
 
         Direction dir = Utils.randomDirection();
         if (closestEnemyRobot != null) {
-            dir = rc.getLocation().directionTo(closestEnemyRobot.getLocation());
+            dir = Memory.rc.getLocation().directionTo(closestEnemyRobot.getLocation());
         }
 
-        if (rc.canMove(dir)) {
-            rc.move(dir);
+        if (Memory.rc.canMove(dir)) {
+            Memory.rc.move(dir);
         }
 
-        if (rc.getActionCooldownTurns() > 0) return;
+        if (Memory.rc.getActionCooldownTurns() > 0) return;
 
         RobotInfo[] enemyRobotsInActionRange =
-                rc.senseNearbyRobots(rc.getType().actionRadiusSquared, rc.getTeam().opponent());
+                Memory.rc.senseNearbyRobots(Memory.rc.getType().actionRadiusSquared,
+                        Memory.rc.getTeam().opponent());
 
         if (enemyRobotsInActionRange.length == 0) return;
 
-        int damage = rc.getType().getDamage(rc.getLevel());
+        int damage = Memory.rc.getType().getDamage(Memory.rc.getLevel());
 
         int aoeDroidDamage = 0;
         int aoeBuildingDamage = 0;
-        for (RobotInfo ri : rc.senseNearbyRobots(rc.getType().actionRadiusSquared, rc.getTeam().opponent())) {
+
+        RobotInfo[] nearbyRobots =
+                Memory.rc.senseNearbyRobots(Memory.rc.getType().actionRadiusSquared,
+                        Memory.rc.getTeam().opponent());
+
+        for (RobotInfo ri : nearbyRobots) {
             int dmg = ri.getType().getMaxHealth(ri.getLevel()) / 10;
             if (Utils.isDroidType(ri.getType())) {
                 aoeDroidDamage += dmg;
@@ -36,11 +42,11 @@ public class Sage {
         }
 
         if (damage > aoeDroidDamage && damage > aoeBuildingDamage) {
-            rc.attack(enemyRobotsInActionRange[0].getLocation());
+            Memory.rc.attack(enemyRobotsInActionRange[0].getLocation());
         } else if (aoeDroidDamage > aoeBuildingDamage) {
-            rc.envision(AnomalyType.CHARGE);
+            Memory.rc.envision(AnomalyType.CHARGE);
         } else {
-            rc.envision(AnomalyType.FURY);
+            Memory.rc.envision(AnomalyType.FURY);
         }
     }
 }

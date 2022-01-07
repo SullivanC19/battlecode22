@@ -4,9 +4,9 @@ import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
 
 public class Laboratory {
-    public static void run(RobotController rc) throws GameActionException {
-        while (rc.canTransmute()) {
-            rc.transmute();
+    public static void run() throws GameActionException {
+        while (Memory.rc.canTransmute()) {
+            Memory.rc.transmute();
         }
     }
 }
