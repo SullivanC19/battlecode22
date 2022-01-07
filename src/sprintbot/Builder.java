@@ -4,40 +4,40 @@ import battlecode.common.*;
 
 public class Builder {
 
-    public static void run(RobotController rc) throws GameActionException {
-        Communication.updateFood(rc);
+    public static void run() throws GameActionException {
+        Communication.updateLead();
 
         // find closest friendly repairable building
         MapLocation closestRepairLocation = null;
         int closestRepairDist = Integer.MAX_VALUE;
-        for (RobotInfo ri : rc.senseNearbyRobots()) {
-            if (ri.getTeam() == rc.getTeam()
+        for (RobotInfo ri : Memory.rc.senseNearbyRobots()) {
+            if (ri.getTeam() == Memory.rc.getTeam()
             && ri.getHealth() < ri.getType().getMaxHealth(ri.getLevel() )
             && Utils.isBuildingType(ri.getType())
-            && ri.getLocation().distanceSquaredTo(rc.getLocation()) < closestRepairDist) {
+            && ri.getLocation().distanceSquaredTo(Memory.rc.getLocation()) < closestRepairDist) {
                 closestRepairLocation = ri.getLocation();
-                closestRepairDist = closestRepairLocation.distanceSquaredTo(rc.getLocation());
+                closestRepairDist = closestRepairLocation.distanceSquaredTo(Memory.rc.getLocation());
             }
         }
 
         // move toward closest friendly building or move randomly
         Direction dir = Utils.randomDirection();
         if (closestRepairLocation != null) {
-            dir = rc.getLocation().directionTo(closestRepairLocation);
+            dir = Memory.rc.getLocation().directionTo(closestRepairLocation);
         }
 
-        if (rc.canMove(dir)) {
-            rc.move(dir);
+        if (Memory.rc.canMove(dir)) {
+            Memory.rc.move(dir);
         }
 
         // if possible, repair closest friendly building
-        while (closestRepairLocation != null && rc.canRepair(closestRepairLocation)) {
-            rc.repair(closestRepairLocation);
+        while (closestRepairLocation != null && Memory.rc.canRepair(closestRepairLocation)) {
+            Memory.rc.repair(closestRepairLocation);
         }
 
         // build watchtowers sometimes randomly
-        if (rc.senseNearbyRobots(8, rc.getTeam()).length == 0) {
-            Utils.tryBuild(RobotType.WATCHTOWER, rc);
+        if (Memory.rc.senseNearbyRobots(8, Memory.rc.getTeam()).length == 0) {
+            Utils.tryBuild(RobotType.WATCHTOWER);
         }
     }
 

@@ -6,8 +6,12 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Utils {
-    static final Random rng = new Random(6147);
-    static final Direction[] directions = {
+    public static final int MAX_MAP_SIZE = 64;
+    public static final int LEAD_BLOCK_SIZE = 4;
+    public static final int NUM_BLOCKS = MAX_MAP_SIZE / LEAD_BLOCK_SIZE;
+
+    public static final Random rng = new Random(6147);
+    public static final Direction[] directions = {
             Direction.NORTH,
             Direction.NORTHEAST,
             Direction.EAST,
@@ -39,10 +43,10 @@ public class Utils {
         return Arrays.asList(buildableTypes).contains(robotType);
     }
 
-    public static boolean tryBuild(RobotType robotType, RobotController rc) throws GameActionException {
+    public static boolean tryBuild(RobotType robotType) throws GameActionException {
         for (Direction dir : directions) {
-            if (rc.canBuildRobot(robotType, dir)) {
-                rc.buildRobot(robotType, dir);
+            if (Memory.rc.canBuildRobot(robotType, dir)) {
+                Memory.rc.buildRobot(robotType, dir);
                 return true;
             }
         }
@@ -50,13 +54,15 @@ public class Utils {
         return false;
     }
 
-    public static RobotInfo getClosestEnemyRobot(RobotController rc) {
-        RobotInfo[] nearbyEnemyRobots = rc.senseNearbyRobots(rc.getType().visionRadiusSquared, rc.getTeam().opponent());
+    public static RobotInfo getClosestEnemyRobot() {
+        int visionRadiusSquared = Memory.rc.getType().visionRadiusSquared;
+        Team opponent = Memory.rc.getTeam().opponent();
+        RobotInfo[] nearbyEnemyRobots = Memory.rc.senseNearbyRobots(visionRadiusSquared, opponent);
 
         RobotInfo closestEnemyRobot = null;
         int closestDist = Integer.MAX_VALUE;
         for (RobotInfo ri : nearbyEnemyRobots) {
-            int dist = ri.getLocation().distanceSquaredTo(rc.getLocation());
+            int dist = ri.getLocation().distanceSquaredTo(Memory.rc.getLocation());
             if (dist < closestDist) {
                 closestDist = dist;
                 closestEnemyRobot = ri;

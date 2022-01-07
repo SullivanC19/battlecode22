@@ -23,16 +23,18 @@ public strictfp class RobotPlayer {
     };
 
     public static void run(RobotController rc) throws GameActionException {
+        Memory.init(rc);
+
         while (true) {
             try {
                 switch (rc.getType()) {
-                    case ARCHON:        Archon.run(rc);     break;
-                    case MINER:         Miner.run(rc);      break;
-                    case SOLDIER:       Soldier.run(rc);    break;
-                    case LABORATORY:    Laboratory.run(rc); break;
-                    case WATCHTOWER:    Watchtower.run(rc); break;
-                    case BUILDER:       Builder.run(rc);    break;
-                    case SAGE:          Sage.run(rc);       break;
+                    case ARCHON:        Archon.run();     break;
+                    case MINER:         Miner.run();      break;
+                    case SOLDIER:       Soldier.run();    break;
+                    case LABORATORY:    Laboratory.run(); break;
+                    case WATCHTOWER:    Watchtower.run(); break;
+                    case BUILDER:       Builder.run();    break;
+                    case SAGE:          Sage.run();       break;
                 }
             } catch (GameActionException e) {
                 System.out.println(rc.getType() + " Exception");

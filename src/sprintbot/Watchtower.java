@@ -5,12 +5,12 @@ import battlecode.common.RobotController;
 import battlecode.common.RobotInfo;
 
 public class Watchtower {
-    public static void run(RobotController rc) throws GameActionException {
-        Communication.updateFood(rc);
+    public static void run() throws GameActionException {
+        Communication.updateLead();
 
-        RobotInfo closestEnemyRobot = Utils.getClosestEnemyRobot(rc);
-        if (closestEnemyRobot != null && rc.canAttack(closestEnemyRobot.getLocation())) {
-            rc.attack(closestEnemyRobot.getLocation());
+        RobotInfo closestEnemyRobot = Utils.getClosestEnemyRobot();
+        if (closestEnemyRobot != null && Memory.rc.canAttack(closestEnemyRobot.getLocation())) {
+            Memory.rc.attack(closestEnemyRobot.getLocation());
         }
     }
 }
