@@ -27,6 +27,21 @@ public class Communication {
         setFood(blockX, blockY, sensesFoodInBlock, rc);
     }
 
+    private static int getDroidCount(RobotType robotType) {
+        switch (robotType) {
+            case BUILDER:
+                return 0;
+            case SOLDIER:
+                return 0;
+            case MINER:
+                return 0;
+            case SAGE:
+                return 0;
+            default:
+                return 0;
+        }
+    }
+
     private static int getBlockIdx(int blockX, int blockY) {
         return blockX * (MAX_MAP_SIZE / BLOCK_SIZE) + blockY;
     }
