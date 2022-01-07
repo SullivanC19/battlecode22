@@ -10,6 +10,8 @@ public class Utils {
     public static final int LEAD_BLOCK_SIZE = 4;
     public static final int NUM_BLOCKS = MAX_MAP_SIZE / LEAD_BLOCK_SIZE;
 
+    public static final int MAX_NUM_ARCHONS = 8;
+
     public static final Random rng = new Random(6147);
     public static final Direction[] directions = {
             Direction.NORTH,
@@ -31,14 +33,27 @@ public class Utils {
     public static final RobotType[] buildableTypes =
             new RobotType[] {RobotType.WATCHTOWER, RobotType.LABORATORY};
 
+    public static int getDroidTypeIdx(RobotType robotType) {
+        switch (robotType) {
+            case SOLDIER:
+                return 0;
+            case SAGE:
+                return 1;
+            case MINER:
+                return 2;
+            case BUILDER:
+                return 3;
+            default:
+                return -1;
+        }
+    }
+
     public static boolean isDroidType(RobotType robotType) {
         return Arrays.asList(droidTypes).contains(robotType);
     }
-
     public static boolean isBuildingType(RobotType robotType) {
         return Arrays.asList(buildingTypes).contains(robotType);
     }
-
     public static boolean isBuildableType(RobotType robotType) {
         return Arrays.asList(buildableTypes).contains(robotType);
     }

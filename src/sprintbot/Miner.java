@@ -11,6 +11,7 @@ import java.util.Map;
 public class Miner {
     public static void run() throws GameActionException {
         Communication.updateLead();
+        Communication.updateDroidCount();
 
         // move toward closest visible lead location if one exists
         int visionRadiusSquared = Memory.rc.getType().visionRadiusSquared;

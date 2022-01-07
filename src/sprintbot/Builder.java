@@ -6,6 +6,7 @@ public class Builder {
 
     public static void run() throws GameActionException {
         Communication.updateLead();
+        Communication.updateDroidCount();
 
         // find closest friendly repairable building
         MapLocation closestRepairLocation = null;
