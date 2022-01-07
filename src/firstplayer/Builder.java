@@ -36,10 +36,9 @@ public class Builder {
             rc.repair(closestRepairLocation);
         }
 
-        // build buildings sometimes randomly
-        if (Utils.rng.nextInt() % 100 == 0 && rc.getTeamLeadAmount(rc.getTeam()) >= RobotType.LABORATORY.buildCostLead) {
-            RobotType buildingType = Utils.buildableTypes[Utils.rng.nextInt(Utils.buildableTypes.length)];
-            Utils.tryBuild(buildingType, rc);
+        // build watchtowers sometimes randomly
+        if (rc.senseNearbyRobots(8, rc.getTeam()).length == 0) {
+            Utils.tryBuild(RobotType.WATCHTOWER, rc);
         }
     }
 

@@ -20,6 +20,8 @@ public class Utils {
 
     public static final RobotType[] droidTypes =
             new RobotType[] {RobotType.SOLDIER, RobotType.SAGE, RobotType.MINER, RobotType.BUILDER};
+    public static final RobotType[] leadDroidTypes =
+            new RobotType[] {RobotType.SOLDIER, RobotType.MINER, RobotType.BUILDER};
     public static final RobotType[] buildingTypes =
             new RobotType[] {RobotType.ARCHON, RobotType.WATCHTOWER, RobotType.LABORATORY};
     public static final RobotType[] buildableTypes =
