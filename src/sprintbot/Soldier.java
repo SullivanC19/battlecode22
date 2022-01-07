@@ -15,6 +15,10 @@ public class Soldier {
             if (Memory.rc.canAttack(toAttack)) {
                 Memory.rc.attack(toAttack);
             }
+            else if(Memory.rc.canMove(Memory.rc.getLocation().directionTo(toAttack))){
+                Memory.rc.move(Memory.rc.getLocation().directionTo(toAttack))
+            }
+            }
         }
 
         // Also try to move randomly.
