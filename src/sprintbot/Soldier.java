@@ -17,8 +17,7 @@ public class Soldier {
                 Memory.rc.attack(toAttack);
             }
             else if(Memory.rc.canMove(Memory.rc.getLocation().directionTo(toAttack))){
-                Memory.rc.move(Memory.rc.getLocation().directionTo(toAttack))
-            }
+                Memory.rc.move(Memory.rc.getLocation().directionTo(toAttack));
             }
         }
 
