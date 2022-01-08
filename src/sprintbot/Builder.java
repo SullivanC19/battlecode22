@@ -21,14 +21,11 @@ public class Builder {
             }
         }
 
-        // move toward closest friendly building or move randomly
-        Direction dir = Utils.randomDirection();
+        // move toward closest friendly building or explore
         if (closestRepairLocation != null) {
-            dir = Memory.rc.getLocation().directionTo(closestRepairLocation);
-        }
-
-        if (Memory.rc.canMove(dir)) {
-            Memory.rc.move(dir);
+            Pathfinder.moveToward(closestRepairLocation);
+        } else {
+            Pathfinder.explore();
         }
 
         // if possible, repair closest friendly building

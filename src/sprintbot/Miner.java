@@ -26,14 +26,16 @@ public class Miner {
                 }
             }
 
-            Direction dir = Memory.rc.getLocation().directionTo(closestLeadSquare);
-            if (Memory.rc.canMove(dir)) {
-                Memory.rc.move(dir);
+            if (Memory.rc.canMineLead(closestLeadSquare)) {
+                while (Memory.rc.canMineLead(closestLeadSquare)) {
+                    Memory.rc.mineLead(closestLeadSquare);
+                }
+                if (Memory.rc.senseNearbyRobots(2, Memory.rc.getTeam()).length != 0) {
+                    Pathfinder.shuffleRandomly();
+                }
             }
 
-            if (Memory.rc.canMineLead(closestLeadSquare)) {
-                Memory.rc.mineLead(closestLeadSquare);
-            }
+            Pathfinder.moveToward(closestLeadSquare);
 
             return;
         }
@@ -52,20 +54,16 @@ public class Miner {
             MapLocation targetBlock = null;
             for (MapLocation leadBlock : leadBlocks) {
                 int dist = block.distanceSquaredTo(leadBlock);
-                if (dist + 5 >= closestDist) {
-                    cnt++;
-                    if (Utils.rng.nextInt(cnt) == 0) {
-                        targetBlock = leadBlock;
-                    }
+                if (dist == closestDist) {
+                    targetBlock = leadBlock;
+                    break;
                 }
             }
 
             MapLocation targetLoc =
                     new MapLocation((2 * targetBlock.x + 1) * Utils.LEAD_BLOCK_SIZE / 2,
                                     (2 * targetBlock.y + 1) * Utils.LEAD_BLOCK_SIZE / 2);
-            if (Memory.rc.canMove(loc.directionTo(targetLoc))) {
-                Memory.rc.move(loc.directionTo(targetLoc));
-            }
+            Pathfinder.moveToward(targetLoc);
 
             return;
         }

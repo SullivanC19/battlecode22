@@ -27,6 +27,6 @@ public class Soldier {
             }
         }
 
-        Pathfinder.explore();
+        Pathfinder.exploreEnemyArchons();
     }
 }
