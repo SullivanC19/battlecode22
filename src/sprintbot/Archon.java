@@ -32,7 +32,8 @@ public class Archon {
         } else if (Memory.rc.getTeamLeadAmount(Memory.rc.getTeam()) >= RobotType.WATCHTOWER.buildCostLead) {
             double[] stage = Memory.rc.getRoundNum() < 500 ? s1 : (Memory.rc.getRoundNum() < 1000 ? s2 : s3);
             //RobotType droidType = Utils.leadDroidTypes[Utils.rng.nextInt(Utils.leadDroidTypes.length)];
-            if (Communication.getDroidCount(RobotType.MINER) / (double)Memory.rc.getRobotCount() < stage[0]) {
+           // if (Communication.getDroidCount(RobotType.MINER) / (double)Memory.rc.getRobotCount() < stage[0]) {
+            if(Communication.getTotalLeadArea() * 3 > Communication.getDroidCount(RobotType.MINER))
                 Utils.tryBuild(RobotType.MINER);
             } else if (Communication.getDroidCount(RobotType.SOLDIER) / (double)Memory.rc.getRobotCount() < stage[1]) {
                 Utils.tryBuild(RobotType.SOLDIER);
