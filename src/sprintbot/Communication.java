@@ -18,16 +18,17 @@ public class Communication {
         int blockY = loc.y / Utils.LEAD_BLOCK_SIZE;
 
         boolean sensesLeadInBlock = false;
-        int blockRange = (Utils.LEAD_BLOCK_SIZE - 1) * (Utils.LEAD_BLOCK_SIZE - 1) * 2;
-        for (MapLocation leadLoc : Memory.rc.senseNearbyLocationsWithLead(blockRange)) {
-            if (leadLoc.x / Utils.LEAD_BLOCK_SIZE == blockX
-                    && leadLoc.y / Utils.LEAD_BLOCK_SIZE == blockY) {
+        for (MapLocation leadLoc : Memory.rc.senseNearbyLocationsWithLead(Memory.rc.getType().visionRadiusSquared)) {
+            setLeadBlock(blockX, blockY, true);
+            if (leadLoc.x / Utils.LEAD_BLOCK_SIZE == blockX && leadLoc.y / Utils.LEAD_BLOCK_SIZE == blockY) {
                 sensesLeadInBlock = true;
-                break;
+                break; // break early here so units dont time out
             }
         }
 
-        setLeadBlock(blockX, blockY, sensesLeadInBlock);
+        if (!sensesLeadInBlock) {
+            setLeadBlock(blockX, blockY, false);
+        }
     }
 
     public static void updateDroidCount() throws GameActionException {

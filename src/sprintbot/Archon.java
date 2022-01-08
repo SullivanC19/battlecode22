@@ -54,18 +54,12 @@ public class Archon {
         int totalDroids = minerCount + builderCount + soldierCount;
 
         int totalLeadArea = Communication.getTotalLeadArea();
-        if (Memory.rc.getRoundNum() < 15) {
+        if (Memory.rc.getRoundNum() < 20 || minerCount < totalLeadArea * 2 / Memory.rc.getArchonCount()) {
             Utils.tryBuild(RobotType.MINER);
-        } else if (Memory.rc.getRoundNum() < 50) {
-            Utils.tryBuild(Utils.rng.nextBoolean() ? RobotType.MINER : RobotType.SOLDIER);
-        } else if (Memory.rc.getTeamLeadAmount(Memory.rc.getTeam()) >= RobotType.WATCHTOWER.buildCostLead) {
-            if (builderCount < (int) (totalDroids * .2)) {
-                Utils.tryBuild(RobotType.BUILDER);
-            } else if (minerCount < 60 && minerCount < totalLeadArea * 3) {
-                Utils.tryBuild(RobotType.MINER);
-            } else {
-                Utils.tryBuild(RobotType.SOLDIER);
-            }
+        } else if (builderCount < totalLeadArea / 2 / Memory.rc.getArchonCount()) {
+            Utils.tryBuild(RobotType.BUILDER);
+        } else if (Memory.rc.getTeamLeadAmount(Memory.rc.getTeam()) - (10 - Memory.archonId) * RobotType.SOLDIER.buildCostLead >= RobotType.WATCHTOWER.buildCostLead) {
+            Utils.tryBuild(RobotType.SOLDIER);
         }
 
         // archon will reset the droid count for the turn so we put it last
