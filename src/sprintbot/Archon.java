@@ -13,6 +13,11 @@ public class Archon {
     public static void run() throws GameActionException {
         Communication.updateLead();
 
+        Memory.rc.setIndicatorString(
+                Communication.getDroidCount(RobotType.MINER) + " "
+                + Communication.getDroidCount(RobotType.BUILDER) + " "
+                + Communication.getDroidCount(RobotType.SOLDIER) + " ");
+
         int archonCount = Memory.rc.getArchonCount();
         if (Memory.rc.getRoundNum() < 20) {
             Utils.tryBuild(RobotType.MINER);

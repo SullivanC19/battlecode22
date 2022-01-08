@@ -10,7 +10,7 @@ public class Utils {
     public static final int LEAD_BLOCK_SIZE = 4;
     public static final int NUM_BLOCKS = MAX_MAP_SIZE / LEAD_BLOCK_SIZE;
 
-    public static final int MAX_NUM_ARCHONS = 8;
+    public static final int MAX_NUM_ARCHONS = 10;
 
     public static final Random rng = new Random(6147);
     public static final Direction[] directions = {
