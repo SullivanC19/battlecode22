@@ -2,8 +2,6 @@ package sprintbot;
 
 import battlecode.common.*;
 
-import java.nio.file.Path;
-
 public class Soldier {
     public static void run() throws GameActionException {
         Communication.updateLead();

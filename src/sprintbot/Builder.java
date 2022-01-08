@@ -37,7 +37,7 @@ public class Builder {
         }
 
         // build watchtowers sometimes randomly
-        if (Memory.rc.senseNearbyRobots(8, Memory.rc.getTeam()).length == 0) {
+        if (Memory.rc.senseNearbyRobots(4, Memory.rc.getTeam()).length == 0) {
             Utils.tryBuild(RobotType.WATCHTOWER);
         }
     }

@@ -24,4 +24,14 @@ public class Pathfinder {
             exploreLoc = null;
         }
     }
+
+    public static void exploreEnemyArchons() throws GameActionException {
+        if (exploreLoc == null) {
+
+        }
+        int width = Memory.rc.getMapWidth();
+        int height = Memory.rc.getMapHeight();
+
+
+    }
 }
