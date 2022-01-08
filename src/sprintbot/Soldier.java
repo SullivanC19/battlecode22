@@ -11,11 +11,11 @@ public class Soldier {
         int radius = Memory.rc.getType().actionRadiusSquared;
         Team opponent = Memory.rc.getTeam().opponent();
         RobotInfo[] enemies = Memory.rc.senseNearbyRobots(radius, opponent);
-        RobotInfo target = enemies[0]
         if (enemies.length > 0) {
+            RobotInfo target = enemies[0];
             for(int i = enemies.length - 1; i >= 0; i--){
                 if(enemies[i].type == RobotType.ARCHON){
-                    target = enemies[i]
+                    target = enemies[i];
                 }
             }
             MapLocation toAttack = target.location;
