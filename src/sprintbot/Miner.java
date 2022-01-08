@@ -66,14 +66,11 @@ public class Miner {
             if (Memory.rc.canMove(loc.directionTo(targetLoc))) {
                 Memory.rc.move(loc.directionTo(targetLoc));
             }
+
+            return;
         }
 
-        // explore
-        Direction randomDir = Utils.randomDirection();
-        if (Memory.rc.canMove(randomDir)) {
-            Memory.rc.move(randomDir);
-        }
-
+        Pathfinder.explore();
     }
 
 }

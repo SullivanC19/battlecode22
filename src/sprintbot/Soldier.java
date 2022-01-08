@@ -2,6 +2,8 @@ package sprintbot;
 
 import battlecode.common.*;
 
+import java.nio.file.Path;
+
 public class Soldier {
     public static void run() throws GameActionException {
         Communication.updateLead();
@@ -21,10 +23,6 @@ public class Soldier {
             }
         }
 
-        // Also try to move randomly.
-        Direction dir = Utils.randomDirection();
-        if (Memory.rc.canMove(dir)) {
-            Memory.rc.move(dir);
-        }
+        Pathfinder.explore();
     }
 }
