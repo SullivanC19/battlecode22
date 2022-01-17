@@ -1,4 +1,5 @@
 /.vscode/settings.json
+/gradle.properties
 
 dist/*
 build/*
