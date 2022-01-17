@@ -5,11 +5,10 @@ import battlecode.common.RobotController;
 import battlecode.common.RobotType;
 
 
-
-
 public class Archon {
     private static int[][] nextRoundMineable = new int[Utils.MAX_MAP_SIZE / Utils.BLOCK_SIZE][Utils.MAX_MAP_SIZE / Utils.BLOCK_SIZE];
     private static int[][] enemyBlockInfoType = new int[Utils.MAX_MAP_SIZE / Utils.BLOCK_SIZE][Utils.MAX_MAP_SIZE / Utils.BLOCK_SIZE];
+
     public static void run() throws GameActionException {
         Memory.update();
 
@@ -77,10 +76,9 @@ public class Archon {
         if (targetMiningBlocks[1] != null) Memory.rc.setIndicatorDot(Utils.getCenterOfBlock(targetMiningBlocks[1]), 0, 255, 0);
 
         Communication.setTargetBlocks(targetMiningBlocks, true);
-       
-        if (((minerCount < totalMineableBlocks
-                && Utils.rng.nextInt(totalMineableBlocks) < numMineableBlocksClosestTo) 
-                || (closestEnemyBlock == NULL && Memory.rc.getRoundNum() < 100 && minerCount < numArchons * 5))
+
+        if (minerCount < totalMineableBlocks
+                && Utils.rng.nextInt(totalMineableBlocks) < numMineableBlocksClosestTo
                 && totalLead / (numArchons - archonIdx) >= RobotType.MINER.buildCostLead) {
             Utils.tryBuild(RobotType.MINER);
         }
