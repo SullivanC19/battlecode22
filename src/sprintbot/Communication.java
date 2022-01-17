@@ -50,8 +50,8 @@ public class Communication {
     // block info size
     public static final int BLOCK_INFO_ARRAY_COUNT_SIZE = BLOCK_LOC_SIZE;
 
-    public static final int NO_LEAD_BLOCKS_SIZE = BLOCK_INFO_ARRAY_COUNT_SIZE + BLOCK_LOC_SIZE * 8;
-    public static final int NO_ENEMY_BLOCKS_SIZE = BLOCK_INFO_ARRAY_COUNT_SIZE + BLOCK_LOC_SIZE * 8;
+    public static final int NO_LEAD_BLOCKS_SIZE = BLOCK_INFO_ARRAY_COUNT_SIZE + BLOCK_LOC_SIZE * 16;
+    public static final int NO_ENEMY_BLOCKS_SIZE = BLOCK_INFO_ARRAY_COUNT_SIZE + BLOCK_LOC_SIZE * 16;
     public static final int MINEABLE_BLOCKS_SIZE = BLOCK_INFO_ARRAY_COUNT_SIZE + BLOCK_LOC_SIZE * 16;
     public static final int UNMINEABLE_BLOCKS_SIZE = BLOCK_INFO_ARRAY_COUNT_SIZE + BLOCK_LOC_SIZE * 16;
     public static final int ENEMY_THREAT_BLOCKS_SIZE = BLOCK_INFO_ARRAY_COUNT_SIZE + BLOCK_LOC_SIZE * 16;
@@ -191,7 +191,7 @@ public class Communication {
         }
 
         int size = readValue(sizeIdx, BLOCK_INFO_ARRAY_COUNT_SIZE);
-        if (size >= (blockType <= BLOCK_TYPE_NO_ENEMY ? 8 : 16)) return;
+        if (size >= 16) return;
 
         for (int i = 0; i < size; i++) {
             MapLocation existingBlock = decodeBlock(readValue(sizeIdx + BLOCK_INFO_ARRAY_COUNT_SIZE + i * BLOCK_LOC_SIZE, BLOCK_LOC_SIZE));
