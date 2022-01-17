@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Pathfinder {
-    private static MapLocation exploreLoc = null;
+    public static MapLocation exploreLoc = null;
     private static final List<MapLocation> potentialEnemyArchonLocations = new ArrayList<>(Arrays.asList(
             new MapLocation(
                     Memory.rc.getMapWidth() - 1 - Memory.archonLocation.x,
@@ -47,7 +47,18 @@ public class Pathfinder {
                 explore();
                 return;
             }
-            exploreLoc = potentialEnemyArchonLocations.remove((int) (Math.random() * potentialEnemyArchonLocations.size()));
+
+            MapLocation myLoc = Memory.rc.getLocation();
+
+            MapLocation closestArchonLoc = potentialEnemyArchonLocations.get(0);
+            for (int i = 1; i < potentialEnemyArchonLocations.size(); i++) {
+                if (myLoc.distanceSquaredTo(potentialEnemyArchonLocations.get(i)) < myLoc.distanceSquaredTo(closestArchonLoc)) {
+                    closestArchonLoc = potentialEnemyArchonLocations.get(i);
+                }
+            }
+
+            potentialEnemyArchonLocations.remove(closestArchonLoc);
+            exploreLoc = closestArchonLoc;
         }
 
         moveToward(exploreLoc);
@@ -63,6 +74,8 @@ public class Pathfinder {
     }
 
     public static void moveToward(MapLocation loc) throws GameActionException {
+        Memory.rc.setIndicatorLine(Memory.rc.getLocation(), loc, 0, 0, 255);
+
         Direction dir = Memory.rc.getLocation().directionTo(loc);
         if (Memory.rc.canMove(dir)) {
             Memory.rc.move(dir);

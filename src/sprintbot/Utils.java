@@ -7,12 +7,15 @@ import java.util.Random;
 
 public class Utils {
     public static final int MAX_MAP_SIZE = 64;
-    public static final int LEAD_BLOCK_SIZE = 4;
-    public static final int NUM_BLOCKS = MAX_MAP_SIZE / LEAD_BLOCK_SIZE;
+    public static final int BLOCK_SIZE = 4;
+    public static final int NUM_BLOCKS = MAX_MAP_SIZE / BLOCK_SIZE;
 
-    public static final int MAX_NUM_ARCHONS = 10;
+    public static final int MAX_MINERS_IN_BLOCK = 2;
 
-    public static final Random rng = new Random(6147);
+    public static final int MAX_NUM_ARCHONS = 4;
+
+    public static Random rng = new Random(0); // seed will be changed to rc id
+
     public static final Direction[] directions = {
             Direction.NORTH,
             Direction.NORTHEAST,
@@ -89,6 +92,26 @@ public class Utils {
 
     public static Direction randomDirection() {
         return directions[rng.nextInt(directions.length)];
+    }
+
+    public static MapLocation getRandomBlock() {
+        return new MapLocation(
+                rng.nextInt(Memory.rc.getMapWidth() / BLOCK_SIZE),
+                rng.nextInt(Memory.rc.getMapHeight() / BLOCK_SIZE));
+    }
+
+    public static MapLocation getBlock(MapLocation loc) {
+        return new MapLocation(loc.x / BLOCK_SIZE, loc.y / BLOCK_SIZE);
+    }
+
+    public static MapLocation getMyBlock() {
+        return getBlock(Memory.rc.getLocation());
+    }
+
+    public static MapLocation getCenterOfBlock(MapLocation block) {
+        return new MapLocation(
+                (2 * block.x + 1) * BLOCK_SIZE / 2,
+                (2 * block.y + 1) * BLOCK_SIZE / 2);
     }
 
 }
