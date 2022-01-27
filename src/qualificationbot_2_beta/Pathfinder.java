@@ -1,4 +1,4 @@
-package qualificationbot_0;
+package qualificationbot_2_beta;
 
 import battlecode.common.*;
 
@@ -7,7 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Pathfinder {
-    public static MapLocation exploreLoc = null;
+    private static Direction exploreDir = Direction.CENTER;
+    private static MapLocation exploreLoc = null;
+    private static MapLocation exploreBlock = null;
+
+    private static MapLocation lastExploreBlockCenter = null;
+
     private static final List<MapLocation> potentialEnemyArchonLocations = new ArrayList<>(Arrays.asList(
             new MapLocation(
                     Memory.rc.getMapWidth() - 1 - Memory.archonLocation.x,
@@ -20,31 +25,45 @@ public class Pathfinder {
                     Memory.archonLocation.y)
     ));
 
-    public static void explore() throws GameActionException {
-        if (exploreLoc == null) {
-            int width = Memory.rc.getMapWidth();
-            int height = Memory.rc.getMapHeight();
+    public static void exploreRandomly() throws GameActionException {
+        MapLocation myBlock = Utils.getMyBlock();
+        MapLocation archonBlock = Utils.getBlock(Memory.archonLocation);
 
-            int x = Memory.archonLocation.x + Utils.rng.nextInt(width * 2 + 1) - width;
-            int y = Memory.archonLocation.y + Utils.rng.nextInt(height * 2 + 1) - height;
+        int mapBlockWidth = Memory.rc.getMapWidth() / Utils.BLOCK_SIZE;
+        int mapBlockHeight = Memory.rc.getMapHeight() / Utils.BLOCK_SIZE;
 
-            x = Math.max(0, Math.min(width - 1, x));
-            y = Math.max(0, Math.min(height - 1, y));
-            exploreLoc = new MapLocation(x, y);
+        if (lastExploreBlockCenter == null
+                || !lastExploreBlockCenter.isAdjacentTo(myBlock)
+                || exploreBlock == null
+                || exploreBlock.equals(myBlock)) {
+            exploreBlock = null;
+            lastExploreBlockCenter = myBlock;
+
+            int furthestDistFromArchon = Integer.MIN_VALUE;
+            for (int i = 0; i < 3; i++) {
+                int dx = (int) (Utils.rng.nextGaussian() * mapBlockWidth / 4);
+                int dy = (int) (Utils.rng.nextGaussian() * mapBlockHeight / 4);
+                MapLocation block = new MapLocation(
+                        Math.max(0, Math.min(mapBlockWidth - 1, myBlock.x + dx)),
+                        Math.max(0, Math.min(mapBlockHeight - 1, myBlock.y + dy)));
+                int distFromArchon = Math.max(Math.abs(block.x - archonBlock.x), Math.abs(block.y - archonBlock.y));
+                if (distFromArchon > furthestDistFromArchon) {
+                    exploreBlock = block;
+                    furthestDistFromArchon = distFromArchon;
+                }
+            }
         }
 
-        Direction dir = Memory.rc.getLocation().directionTo(exploreLoc);
-        if (Memory.rc.canMove(dir)) {
-            Memory.rc.move(dir);
-        } else if (Memory.rc.getMovementCooldownTurns() == 0) {
-            exploreLoc = null;
-        }
+        Memory.rc.setIndicatorLine(Memory.rc.getLocation(), Utils.getCenterOfBlock(exploreBlock), 0, 0, 100);
+
+        Pathfinder.moveTo(Utils.getCenterOfBlock(exploreBlock));
+        lastExploreBlockCenter = myBlock;
     }
 
     public static void exploreEnemyArchons() throws GameActionException {
         if (exploreLoc == null) {
             if (potentialEnemyArchonLocations.isEmpty()) {
-                explore();
+                exploreRandomly();
                 return;
             }
 
@@ -61,7 +80,7 @@ public class Pathfinder {
             exploreLoc = closestArchonLoc;
         }
 
-        moveToward(exploreLoc);
+        moveTo(exploreLoc);
 
         if (Memory.rc.canSenseLocation(exploreLoc)) {
             RobotInfo robotAtLocation = Memory.rc.senseRobotAtLocation(exploreLoc);
@@ -357,17 +376,26 @@ public class Pathfinder {
         }
     }
 
-    public static void moveToward(MapLocation loc) throws GameActionException {
-//        Memory.rc.setIndicatorLine(Memory.rc.getLocation(), loc, 0, 0, 255);
+    public static void moveAway(MapLocation loc) throws GameActionException {
+        MapLocation myLoc = Memory.rc.getLocation();
 
-        Direction dir = Memory.rc.getLocation().directionTo(loc);
-        if (Memory.rc.canMove(dir)) {
-            Memory.rc.move(dir);
-        } else if (Memory.rc.canMove(dir.rotateRight())) {
-            Memory.rc.move(dir.rotateRight());
-        } else if (Memory.rc.canMove(dir.rotateLeft())) {
-            Memory.rc.move(dir.rotateLeft());
+        Memory.rc.setIndicatorLine(myLoc, loc, 120, 0, 0);
+
+        Direction initDir = loc.directionTo(myLoc);
+        Direction bestDir = initDir;
+        int lowestRubble = Integer.MAX_VALUE;
+        for (Direction dir = initDir.rotateLeft(); dir != initDir.rotateRight().rotateRight(); dir = dir.rotateRight()) {
+            MapLocation adjLoc = loc.add(dir);
+            if (!Memory.rc.canSenseLocation(adjLoc) || Memory.rc.isLocationOccupied(adjLoc)) continue;
+
+            int rubble = Memory.rc.senseRubble(adjLoc);
+            if (rubble < lowestRubble) {
+                bestDir = dir;
+                lowestRubble = rubble;
+            }
         }
+
+        if (Memory.rc.canMove(bestDir)) Memory.rc.move(bestDir);
     }
 
     public static void shuffleRandomly() throws GameActionException {

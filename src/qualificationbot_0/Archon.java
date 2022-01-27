@@ -94,11 +94,11 @@ public class Archon {
             }
         }
 
-        for (int i = 0; i < 2; i++) {
-            if (targetMiningBlocks[i] != null) {
-                Memory.rc.setIndicatorLine(Memory.archonLocation, Utils.getCenterOfBlock(targetMiningBlocks[i]), 0, 255, 0);
-            }
-        }
+//        for (int i = 0; i < 2; i++) {
+//            if (targetMiningBlocks[i] != null) {
+//                Memory.rc.setIndicatorLine(Memory.archonLocation, Utils.getCenterOfBlock(targetMiningBlocks[i]), 0, 255, 0);
+//            }
+//        }
 
 //        if (targetMiningBlocks[0] != null) Memory.rc.setIndicatorDot(Utils.getCenterOfBlock(targetMiningBlocks[0]), 0, 255, 0);
 //        if (targetMiningBlocks[1] != null) Memory.rc.setIndicatorDot(Utils.getCenterOfBlock(targetMiningBlocks[1]), 0, 255, 0);

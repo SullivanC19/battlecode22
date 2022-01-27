@@ -1,0 +1,191 @@
+package qualificationbot_2;
+
+import battlecode.common.*;
+
+import java.nio.file.Path;
+
+public class Soldier {
+    public static void run() throws GameActionException {
+        Communication.updateArchonIdx();
+        Communication.resetBlockInfoBroadcasted();
+
+        // NOTE remember to pull counts before this
+        Communication.updateDroidCount();
+
+        MapLocation myBlock = Utils.getMyBlock();
+        MapLocation archonBlock = Utils.getBlock(Memory.archonLocation);
+
+        int health = Memory.rc.getHealth();
+        int maxHealth = RobotType.SOLDIER.health;
+
+        if (health < maxHealth && (Utils.dist(Memory.rc.getLocation(), Memory.archonLocation) <= 5 || health <= maxHealth / 5)) {
+            Pathfinder.moveTo(Memory.archonLocation);
+
+            int higherHealthCount = 0;
+
+            int distToArchon = Memory.rc.getLocation().distanceSquaredTo(Memory.archonLocation);
+            for (RobotInfo ri : Memory.rc.senseNearbyRobots(distToArchon, Memory.rc.getTeam())) {
+                if ((ri.getType() == RobotType.SOLDIER || ri.getType() == RobotType.SAGE)
+                        && ri.getLocation().distanceSquaredTo(Memory.archonLocation) <= RobotType.ARCHON.actionRadiusSquared
+                        && ri.getHealth() < ri.getType().getMaxHealth(ri.getLevel())
+                        && ri.getHealth() > Memory.rc.getHealth()) {
+                    higherHealthCount++;
+                }
+            }
+
+            if (higherHealthCount >= 3
+                    && Memory.rc.senseLead(Memory.rc.getLocation()) == 0
+                    && health <= maxHealth / 5
+                    && Memory.rc.getLocation().distanceSquaredTo(Memory.archonLocation) <= RobotType.ARCHON.visionRadiusSquared) {
+                Memory.rc.disintegrate();
+            }
+        }
+
+        MapLocation[] mineableLocs = Memory.rc.senseNearbyLocationsWithLead(RobotType.SOLDIER.visionRadiusSquared, Archon.MIN_MINEABLE_LEAD);
+
+        for (int i = 0; i < mineableLocs.length; i++) {
+            Communication.addBlockInfo(Communication.BLOCK_TYPE_MINEABLE, Utils.getBlock(mineableLocs[i]));
+        }
+
+        RobotInfo[] enemyRobots = Memory.rc.senseNearbyRobots(
+                RobotType.SOLDIER.visionRadiusSquared, Memory.rc.getTeam().opponent());
+
+        boolean isThreat = false;
+        for (int i = 0; i < enemyRobots.length; i++) {
+            RobotType type = enemyRobots[i].getType();
+            if (type == RobotType.SOLDIER || type == RobotType.SAGE || type == RobotType.WATCHTOWER) {
+                isThreat = true;
+                break;
+            }
+        }
+
+        if (enemyRobots.length > 0) {
+            Communication.addBlockInfo(
+                    isThreat ? Communication.BLOCK_TYPE_THREAT : Communication.BLOCK_TYPE_NONTHREAT,
+                    myBlock);
+        }
+
+        if (enemyRobots.length > 0) {
+            micro(enemyRobots);
+        } else {
+            int closestEnemyBlockDist = Integer.MAX_VALUE;
+            MapLocation closestEnemyBlock = null;
+            for (int i = 0; i < Communication.NUM_TARGET_BLOCKS; i++) {
+                MapLocation enemyBlock = Communication.getTargetEnemyBlock(i);
+                if (enemyBlock == null) continue;
+                int dist = Utils.dist(myBlock, enemyBlock);
+                if (dist < closestEnemyBlockDist) {
+                    closestEnemyBlockDist = dist;
+                    closestEnemyBlock = enemyBlock;
+                }
+            }
+
+            if (closestEnemyBlock != null && closestEnemyBlock.equals(myBlock)) {
+                Communication.addBlockInfo(Communication.BLOCK_TYPE_NO_ENEMY, closestEnemyBlock);
+            } else if (closestEnemyBlock != null) {
+                Pathfinder.moveTo(Utils.getCenterOfBlock(closestEnemyBlock));
+            } else {
+                Pathfinder.exploreEnemyArchons();
+            }
+        }
+    }
+
+    // priorities for micro attack
+    // - in range to attack someone (who?)
+    // - low rubble
+    // - close to non-threatening units (miner, builder, archon, laboratory)
+    // - end up in a square safe from attack or tanking for a soldier behind
+    private static void micro(RobotInfo[] enemyRobots) throws GameActionException {
+        MapLocation myLoc = Memory.rc.getLocation();
+
+        // ignore safety if there are friendly robots adjacent
+        int friendlyRobotsAdjacent = Memory.rc.senseNearbyRobots(2, Memory.rc.getTeam()).length;
+
+        // find the highest ordinal enemy in action radius if one exists
+        RobotInfo firstTarget = null;
+        RobotInfo[] enemyRobotsInActionRadius = Memory.rc.senseNearbyRobots(
+                RobotType.SOLDIER.actionRadiusSquared, Memory.rc.getTeam().opponent());
+        for (RobotInfo ri : enemyRobotsInActionRadius) {
+            if (firstTarget == null || ri.getType().ordinal() >= firstTarget.getType().ordinal()) {
+                firstTarget = ri;
+            }
+        }
+
+        int bestScore = Integer.MIN_VALUE;
+        RobotInfo bestTarget = firstTarget;
+        Direction bestDir = null;
+
+        // pick best of all adjacent locations
+        for (Direction dir : Direction.allDirections()) {
+            MapLocation adjLoc = Memory.rc.adjacentLocation(dir);
+            if (dir != Direction.CENTER && (!Memory.rc.canSenseLocation(adjLoc) || Memory.rc.isLocationOccupied(adjLoc))) continue;
+
+            RobotInfo target = firstTarget;
+            int targetOrdinal = firstTarget == null ? -1 : firstTarget.getType().ordinal();
+            int distToNonthreatDroid = 400;
+            int distToThreatDroid = 400;
+            int potentialDamageTaken = 0;
+            int rubble = Memory.rc.senseRubble(adjLoc);
+
+            // find closest non-threatening droid to loc and check if loc is out of range of enemy units
+            for (RobotInfo ri : enemyRobots) {
+                int dist = adjLoc.distanceSquaredTo(ri.getLocation());
+                switch (ri.getType()) {
+                    case MINER:
+                    case BUILDER:
+                    case ARCHON:
+                        distToNonthreatDroid = Math.min(distToNonthreatDroid, dist);
+                        break;
+                    case SOLDIER:
+                    case SAGE:
+                    case WATCHTOWER:
+                        distToThreatDroid = Math.min(distToThreatDroid, dist);
+                        potentialDamageTaken += dist <= ri.getType().actionRadiusSquared ? ri.getType().damage : 0;
+                        break;
+                }
+            }
+
+            // choose highest ordinal target from those in range
+            RobotInfo[] eriar = Memory.rc.senseNearbyRobots(
+                    adjLoc, RobotType.SOLDIER.actionRadiusSquared, Memory.rc.getTeam().opponent());
+            for (RobotInfo ri : eriar) {
+                if (ri.getType().ordinal() >= targetOrdinal) {
+                    target = ri;
+                    targetOrdinal = ri.getType().ordinal();
+                }
+            }
+
+            int targetScore = (firstTarget == null && target != null) ? 10 + targetOrdinal : 0;
+            int rubbleScore = -rubble;
+//            int distToNonthreatScore = -distToNonthreatDroid / 5;
+//            int mobScore = friendlyRobotsAdjacent * -distToThreatDroid;
+            int potentialDamageScore = -potentialDamageTaken / (friendlyRobotsAdjacent + 1);
+
+            int score = targetScore
+                    + rubbleScore
+                    + potentialDamageScore
+                    + (friendlyRobotsAdjacent >= 4 ? -distToThreatDroid : 0)
+                    + (dir == Direction.CENTER ? 1 : 0);
+            if (score > bestScore) {
+                bestScore = score;
+                bestDir = dir;
+
+                if (bestTarget == null || (targetOrdinal > bestTarget.getType().ordinal())) {
+                    bestTarget = target;
+                }
+            }
+        }
+
+        if (bestTarget != null && Memory.rc.canAttack(bestTarget.getLocation())) {
+            Memory.rc.attack(bestTarget.getLocation());
+        }
+
+        if (bestDir != null && Memory.rc.canMove(bestDir)) {
+            Memory.rc.move(bestDir);
+        }
+
+        if (bestTarget != null && Memory.rc.canAttack(bestTarget.getLocation())) {
+            Memory.rc.attack(bestTarget.getLocation());
+        }
+    }
+}
